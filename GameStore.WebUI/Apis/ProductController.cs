@@ -37,7 +37,7 @@ namespace GameStore.WebUI.Apis
                     var query = from product in context.Products
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                      select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                      select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
 
                     List<ProductDTO> products = query.ToList();
                     HttpContext.Current.Cache["ProductList"] = products;
@@ -49,7 +49,7 @@ namespace GameStore.WebUI.Apis
                                 where product.CategoryId == value.CategoryId
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     List<ProductDTO> products = query.ToList();
                     HttpContext.Current.Cache["ProductList" + value.CategoryId] = products;
                     return products;                 
@@ -70,7 +70,7 @@ namespace GameStore.WebUI.Apis
                                where product.UserId == userid
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                              select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                              select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     List<ProductDTO> products = query.ToList();
                     return products;
                 }
@@ -81,7 +81,7 @@ namespace GameStore.WebUI.Apis
                                   && product.UserId == userid
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                              select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                              select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     List<ProductDTO> products = query.ToList();
                     return products;
                 }
@@ -102,7 +102,7 @@ namespace GameStore.WebUI.Apis
                 }
                 else
                 {
-                    ProductDTO productDTO = new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                    ProductDTO productDTO = new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     HttpContext.Current.Cache["Product" + id] = productDTO;
                     return productDTO;
                 }
@@ -126,7 +126,7 @@ namespace GameStore.WebUI.Apis
                     var query = from product in context.Products
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                              select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                              select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
 
                     List<ProductDTO> products = query.ToList();
                     HttpContext.Current.Cache["ProductList"] = products;
@@ -178,14 +178,11 @@ namespace GameStore.WebUI.Apis
                     //        return Request.CreateResponse(HttpStatusCode.OK, "The image format is not valid, must be .jpg, .png, .gif, or .jpeg");
                     //    }
                     //}
-                    Product newProduct = context.Products.Create();
-                    newProduct.ProductName = value.ProductName;
-                    newProduct.CategoryId = value.CategoryId;
-                    newProduct.Price = value.Price;
-                    newProduct.Image = value.Image;
-                    newProduct.Condition = value.Condition;
-                    newProduct.Discount = value.Discount;
-                    newProduct.UserId = User.Identity.GetUserId();
+
+                    Product newProduct = Product.Create(
+                        value.ProductName, value.CategoryId, Money.Create(value.Price),
+                        value.Condition, value.Image, Discount.Create(value.Discount), User.Identity.GetUserId());
+
                     //string root = System.Web.Hosting.HostingEnvironment.MapPath("~/images/");
                     //string filename = string.Format(@"{0}.{1}", DateTime.Now.Ticks, System.IO.Path.GetExtension(file.FileName));
                     //file.SaveAs(System.IO.Path.Combine(root, filename));
@@ -244,12 +241,10 @@ namespace GameStore.WebUI.Apis
                     }
 
                     HttpContext.Current.Cache.Remove("ProductList" + product.CategoryId);
-                    product.ProductName = value.ProductName;
-                    product.CategoryId = value.CategoryId;
-                    product.Price = value.Price;
-                    product.Image = value.Image;
-                    product.Condition = value.Condition;
-                    product.Discount = value.Discount;
+
+                    product.Update(value.ProductName, value.CategoryId, Money.Create(value.Price), 
+                        value.Image, value.Condition, Discount.Create(value.Discount));
+
                     context.SaveChanges();
                     //context.Entry(product).CurrentValues.SetValues(value);
                     //context.SaveChanges();

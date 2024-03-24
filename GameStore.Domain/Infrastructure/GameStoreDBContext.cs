@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using GameStore.Domain.Model;
 using Microsoft.AspNet.Identity.EntityFramework;
 using GameStore.Domain.Identity;
+using System.Runtime.InteropServices;
 
 namespace GameStore.Domain.Infrastructure
 {
@@ -30,5 +31,16 @@ namespace GameStore.Domain.Infrastructure
         public virtual DbSet<Review> Reviews { get; set; }
         public virtual DbSet<OrderItem> OrderItems { get; set; }
         public virtual DbSet<Order> Orders { get; set; }
+
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            var product = modelBuilder.Entity<Product>();
+            product.Ignore(x => x.Discount);
+            product.Property(x => x.DiscountValue).HasColumnName(nameof(Product.Discount));
+
+            product.Ignore(x => x.Price);
+            product.Property(x => x.PriceValue).HasColumnName(nameof(Product.Price));
+        }
     }
 }

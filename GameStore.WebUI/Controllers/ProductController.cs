@@ -46,7 +46,7 @@ namespace GameStore.WebUI.Controllers
                                 where product.CategoryId == categoryid
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     list = query.ToList();
                     System.Web.HttpContext.Current.Cache["ProductList" + categoryid] = list;
                 }
@@ -66,7 +66,7 @@ namespace GameStore.WebUI.Controllers
                     var query = from product in context.Products
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     list = query.ToList();
                 }
                 else
@@ -75,7 +75,7 @@ namespace GameStore.WebUI.Controllers
                                 where product.ProductName.ToLower().Contains(productname.ToLower())
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                                select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     list = query.ToList();
                 }
             }
@@ -88,11 +88,14 @@ namespace GameStore.WebUI.Controllers
             ProductDTO model = null;
             using (GameStoreDBContext context = new GameStoreDBContext())
             {
+                var p = context.Products
+                    .FirstOrDefault(x => x.ProductId == id);
+                
                 var query = from product in context.Products
                             where product.ProductId == id
                             join category in context.Categories
                               on product.CategoryId equals category.CategoryId
-                            select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                            select new ProductDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                 model = query.FirstOrDefault();
             }
             return View(model);
@@ -127,7 +130,7 @@ namespace GameStore.WebUI.Controllers
                                 where product.UserId == userid
                                 join category in context.Categories
                                   on product.CategoryId equals category.CategoryId
-                                select new ProductOrderDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.Price, Image = product.Image, Condition = product.Condition, Discount = product.Discount, UserId = product.UserId };
+                                select new ProductOrderDTO { ProductId = product.ProductId, ProductName = product.ProductName, CategoryId = product.CategoryId, CategoryName = category.CategoryName, Price = product.PriceValue, Image = product.Image, Condition = product.Condition, Discount = product.DiscountValue, UserId = product.UserId };
                     list = query.ToList();                    
 
                     foreach (ProductOrderDTO product in list)

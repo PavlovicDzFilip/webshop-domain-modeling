@@ -36,10 +36,9 @@ namespace GameStore.WebUI.Models
             Quantity = Quantity + 1;
         }
 
-
         public double GetDiscountedPrice()
         {
-            return ProductItem.Price * (100 - ProductItem.Discount) / 100;
+            return ProductItem.GetDiscountedPrice().Value;
         }     
 
         public double GetTotalCost()

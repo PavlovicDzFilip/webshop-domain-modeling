@@ -165,8 +165,8 @@ namespace GameStore.WebUI.Controllers
                                              join c in context.Categories
                                                on p.CategoryId equals c.CategoryId
                                              where i.OrderId == newOrder.OrderId
-                                             select new { i.OrderItemId, i.OrderId, i.ProductId, p.ProductName, p.CategoryId, c.CategoryName, p.Price, p.Image, p.Condition, p.Discount, i.Quantity };
-                            model.Items = orderitems.Select(o => new OrderItemViewModel { OrderItemId = o.OrderItemId, OrderId = o.OrderId, ProductId = o.ProductId, ProductName = o.ProductName, CategoryId = o.CategoryId, CategoryName = o.CategoryName, Price = o.Price, Image = o.Image, Condition = o.Condition, Discount = o.Discount, Quantity = o.Quantity }).ToList();
+                                             select new { i.OrderItemId, i.OrderId, i.ProductId, p.ProductName, p.CategoryId, c.CategoryName, p.PriceValue, p.Image, p.Condition, p.DiscountValue, i.Quantity };
+                            model.Items = orderitems.Select(o => new OrderItemViewModel { OrderItemId = o.OrderItemId, OrderId = o.OrderId, ProductId = o.ProductId, ProductName = o.ProductName, CategoryId = o.CategoryId, CategoryName = o.CategoryName, Price = o.PriceValue, Image = o.Image, Condition = o.Condition, Discount = o.DiscountValue, Quantity = o.Quantity }).ToList();
                         }
                     }
                     catch (Exception ex)
